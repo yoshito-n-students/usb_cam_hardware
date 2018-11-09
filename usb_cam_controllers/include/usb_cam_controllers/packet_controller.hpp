@@ -25,6 +25,8 @@ public:
 
   virtual bool init(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                     ros::NodeHandle &controller_nh) {
+    format_ = controller_nh.param< std::string >("format", "");
+
     if (!hw) {
       ROS_ERROR("Null packet interface");
       return false;
@@ -70,7 +72,7 @@ public:
 
     // publish the packet
     publisher_->msg_.header.stamp = packet_.getStamp();
-    publisher_->msg_.format = "hoge";
+    publisher_->msg_.format = format_;
     publisher_->msg_.data.assign(packet_.getStartAs< uint8_t >(),
                                  packet_.getStartAs< uint8_t >() + packet_.getLength());
     publisher_->unlockAndPublish();
@@ -83,6 +85,8 @@ public:
 
 private:
   typedef realtime_tools::RealtimePublisher< sensor_msgs::CompressedImage > Publisher;
+
+  std::string format_;
 
   usb_cam_hardware_interface::PacketHandle packet_;
   boost::shared_ptr< Publisher > publisher_;
