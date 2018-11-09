@@ -8,6 +8,7 @@ project(usb_cam_controllers)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  camera_info_manager
   controller_interface
   controller_manager
   pluginlib
@@ -110,6 +111,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES usb_cam_controllers
   CATKIN_DEPENDS 
+  camera_info_manager
   controller_interface 
   controller_manager 
   pluginlib 

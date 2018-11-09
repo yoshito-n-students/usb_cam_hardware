@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 
+#include <camera_info_manager/camera_info_manager.h>
 #include <controller_interface/controller.h>
 #include <realtime_tools/realtime_publisher.h>
 #include <ros/duration.h>
@@ -24,6 +25,8 @@ public:
 
   virtual bool init(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                     ros::NodeHandle &controller_nh) {
+    frame_id_ = controller_nh.param< std::string >("camera_frame_id", "head_camera");
+
     if (!hw) {
       ROS_ERROR("Null packet interface");
       return false;
@@ -41,6 +44,9 @@ public:
 
     packet_ = hw->getHandle(names.front());
     publisher_ = boost::make_shared< Publisher >(root_nh, "camera_info", 1);
+    info_manager_ = boost::make_shared< camera_info_manager::CameraInfoManager >(
+        root_nh, controller_nh.param< std::string >("camera_name", "head_camera"),
+        controller_nh.param< std::string >("camera_info_url", ""));
     last_stamp_ = ros::Time(0);
 
     return true;
@@ -68,9 +74,9 @@ public:
     }
 
     // publish the camera info
-    publisher_->msg_ = sensor_msgs::CameraInfo(); // TODO: get info from CameraInfoManager
+    publisher_->msg_ = info_manager_->getCameraInfo();
     publisher_->msg_.header.stamp = packet_.getStamp();
-    publisher_->msg_.header.frame_id = ""; // TODO: set reasonable frame id
+    publisher_->msg_.header.frame_id = frame_id_;
     publisher_->unlockAndPublish();
     last_stamp_ = packet_.getStamp();
   }
@@ -82,8 +88,11 @@ public:
 private:
   typedef realtime_tools::RealtimePublisher< sensor_msgs::CameraInfo > Publisher;
 
+  std::string frame_id_;
+
   usb_cam_hardware_interface::PacketHandle packet_;
   boost::shared_ptr< Publisher > publisher_;
+  boost::shared_ptr< camera_info_manager::CameraInfoManager > info_manager_;
   ros::Time last_stamp_;
 };
 
