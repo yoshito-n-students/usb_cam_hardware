@@ -11,7 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
   controller_interface
   controller_manager
   pluginlib
+  realtime_tools
   roscpp
+  sensor_msgs
   usb_cam_hardware_interface
 )
 
@@ -107,7 +109,14 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES usb_cam_controllers
-  CATKIN_DEPENDS controller_interface controller_manager pluginlib roscpp usb_cam_hardware_interface
+  CATKIN_DEPENDS 
+  controller_interface 
+  controller_manager 
+  pluginlib 
+  realtime_tools 
+  roscpp 
+  sensor_msgs 
+  usb_cam_hardware_interface
 #  DEPENDS system_lib
 )
 
