@@ -22,7 +22,10 @@ public:
 
   std::string getName() const { return name_; }
   ros::Time getStamp() const { return *stamp_; }
-  const void *getStart() const { return *start_; };
+  const void *getStart() const { return *start_; }
+  template < typename Byte > const Byte *getStartAs() const {
+    return reinterpret_cast< const Byte * >(*start_);
+  };
   std::size_t getLength() const { return *length_; }
 
 private:
