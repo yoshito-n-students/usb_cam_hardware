@@ -105,8 +105,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES usb_cam_controllers
+  INCLUDE_DIRS include
+  LIBRARIES usb_cam_controllers
   CATKIN_DEPENDS controller_interface controller_manager pluginlib roscpp usb_cam_hardware_interface
 #  DEPENDS system_lib
 )
@@ -118,14 +118,15 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/usb_cam_controllers.cpp
-# )
+add_library(
+  usb_cam_controllers
+  src/usb_cam_controllers.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -148,9 +149,10 @@ include_directories(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(
+  usb_cam_controllers
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
