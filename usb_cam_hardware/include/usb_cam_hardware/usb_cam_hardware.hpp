@@ -32,11 +32,12 @@ public:
   bool init(ros::NodeHandle param_nh) {
     // register the packet buffer to the interface so that controllers can see the packet
     {
+      packet_.stamp = ros::Time(0);
       packet_.start = NULL;
       packet_.length = 0;
       packet_.buffer_index = -1;
-      packet_interface_.registerHandle(
-          usb_cam_hardware_interface::PacketHandle("packet", &packet_.start, &packet_.length));
+      packet_interface_.registerHandle(usb_cam_hardware_interface::PacketHandle(
+          "packet", &packet_.stamp, &packet_.start, &packet_.length));
       registerInterface(&packet_interface_);
     }
 
@@ -208,6 +209,7 @@ public:
     }
 
     // fill packet info with the poped buffer
+    packet_.stamp = ros::Time::now();
     packet_.start = buffers_[buffer.index].start;
     packet_.length = buffer.bytesused;
     packet_.buffer_index = buffer.index;
@@ -222,6 +224,7 @@ public:
       buffer.memory = V4L2_MEMORY_MMAP;
       buffer.index = packet_.buffer_index;
       if (xioctl(fd_, VIDIOC_QBUF, &buffer) == 0) {
+        packet_.stamp = ros::Time(0);
         packet_.start = NULL;
         packet_.length = 0;
         packet_.buffer_index = -1;
@@ -243,6 +246,7 @@ private:
 
 private:
   struct Packet {
+    ros::Time stamp;
     const void *start;
     std::size_t length;
     int buffer_index;
