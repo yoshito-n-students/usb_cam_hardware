@@ -57,12 +57,12 @@ public:
       v4l2_cropcap cropcap;
       std::memset(&cropcap, 0, sizeof(cropcap));
       // get the cropping capability
-      if (ioctl(fd_, VIDIOC_CROPCAP, &cropcap) == 0) {
+      if (xioctl(fd_, VIDIOC_CROPCAP, &cropcap) == 0) {
         // set the default (no) cropping
         v4l2_crop crop;
         crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         crop.c = cropcap.defrect;
-        ioctl(fd_, VIDIOC_S_CROP, &crop);
+        xioctl(fd_, VIDIOC_S_CROP, &crop);
       }
     }
 
@@ -91,7 +91,7 @@ public:
         return false;
       }
       format.fmt.pix.field = V4L2_FIELD_INTERLACED;
-      if (ioctl(fd_, VIDIOC_S_FMT, &format) < 0) {
+      if (xioctl(fd_, VIDIOC_S_FMT, &format) < 0) {
         ROS_ERROR("Cannot set format");
         return false;
       }
@@ -102,13 +102,13 @@ public:
       v4l2_streamparm streamparm;
       std::memset(&streamparm, 0, sizeof(streamparm));
       streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-      if (ioctl(fd_, VIDIOC_G_PARM, &streamparm) < 0) {
+      if (xioctl(fd_, VIDIOC_G_PARM, &streamparm) < 0) {
         ROS_ERROR("Cannot get streaming parameters");
         return false;
       }
       streamparm.parm.capture.timeperframe.numerator = 1;
       streamparm.parm.capture.timeperframe.denominator = param_nh.param("framerate", 30);
-      if (ioctl(fd_, VIDIOC_S_PARM, &streamparm) < 0) {
+      if (xioctl(fd_, VIDIOC_S_PARM, &streamparm) < 0) {
         ROS_ERROR("Cannot set framerate");
         return false;
       }
@@ -122,7 +122,7 @@ public:
       reqbufs.count = 4;
       reqbufs.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       reqbufs.memory = V4L2_MEMORY_MMAP;
-      if (ioctl(fd_, VIDIOC_REQBUFS, &reqbufs) < 0) {
+      if (xioctl(fd_, VIDIOC_REQBUFS, &reqbufs) < 0) {
         ROS_ERROR("Cannot request buffers");
         return false;
       }
@@ -137,7 +137,7 @@ public:
         buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buffer.memory = V4L2_MEMORY_MMAP;
         buffer.index = i;
-        if (ioctl(fd_, VIDIOC_QUERYBUF, &buffer) < 0) {
+        if (xioctl(fd_, VIDIOC_QUERYBUF, &buffer) < 0) {
           ROS_ERROR("Cannot query buffer");
           return false;
         }
@@ -163,7 +163,7 @@ public:
         buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         buffer.memory = V4L2_MEMORY_MMAP;
         buffer.index = i;
-        if (ioctl(fd_, VIDIOC_QBUF, &buffer) < 0) {
+        if (xioctl(fd_, VIDIOC_QBUF, &buffer) < 0) {
           ROS_ERROR("Cannot enqueue buffer");
           return false;
         }
@@ -171,7 +171,7 @@ public:
 
       v4l2_buf_type buf_type;
       buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-      if (ioctl(fd_, VIDIOC_STREAMON, &buf_type) < 0) {
+      if (xioctl(fd_, VIDIOC_STREAMON, &buf_type) < 0) {
         ROS_ERROR("Cannot start streaming");
         return false;
       }
@@ -192,7 +192,7 @@ public:
     std::memset(&buffer, 0, sizeof(buffer));
     buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     buffer.memory = V4L2_MEMORY_MMAP;
-    if (ioctl(fd_, VIDIOC_DQBUF, &buffer) < 0) {
+    if (xioctl(fd_, VIDIOC_DQBUF, &buffer) < 0) {
       switch (errno) {
       case EAGAIN:
         /* */
@@ -221,7 +221,7 @@ public:
       buffer.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       buffer.memory = V4L2_MEMORY_MMAP;
       buffer.index = packet_.buffer_index;
-      if (ioctl(fd_, VIDIOC_QBUF, &buffer) == 0) {
+      if (xioctl(fd_, VIDIOC_QBUF, &buffer) == 0) {
         packet_.start = NULL;
         packet_.length = 0;
         packet_.buffer_index = -1;
@@ -229,6 +229,16 @@ public:
         ROS_ERROR("Cannot enqueue buffer");
       }
     }
+  }
+
+private:
+  static int xioctl(int fd, int request, void *arg) {
+    int result;
+    do {
+      result = ioctl(fd, request, arg);
+      // retry if failed because of temporary signal interruption
+    } while (result < 0 && errno == EINTR);
+    return result;
   }
 
 private:
