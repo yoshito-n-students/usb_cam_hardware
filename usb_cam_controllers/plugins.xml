@@ -1,0 +1,9 @@
+<library path="lib/libusb_cam_controllers">
+  <class name="usb_cam_controllers/PacketController" type="usb_cam_controllers::PacketController" 
+         base_class_type="controller_interface::ControllerBase">
+  <description>
+    This controller publishes raw packets read by the hardware. 
+    The controller expects a usb_cam_hardware_interface::PacketInterface as hardware interface.
+  </description>
+  </class>
+</library>
