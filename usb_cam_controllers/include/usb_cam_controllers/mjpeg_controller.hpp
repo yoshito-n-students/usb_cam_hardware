@@ -14,9 +14,6 @@
 #include <ros/time.h>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
-
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
