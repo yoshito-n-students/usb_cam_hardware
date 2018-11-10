@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   camera_info_manager
   controller_interface
   controller_manager
+  cv_bridge
+  image_transport
   pluginlib
   realtime_tools
   roscpp
@@ -114,6 +116,8 @@ catkin_package(
   camera_info_manager
   controller_interface 
   controller_manager 
+  cv_bridge
+  image_transport
   pluginlib 
   realtime_tools 
   roscpp 
