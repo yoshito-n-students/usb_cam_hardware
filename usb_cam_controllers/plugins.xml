@@ -1,6 +1,5 @@
 <library path="lib/libusb_cam_controllers">
 
-
   <class name="usb_cam_controllers/CameraInfoController" type="usb_cam_controllers::CameraInfoController" 
          base_class_type="controller_interface::ControllerBase">
     <description>
