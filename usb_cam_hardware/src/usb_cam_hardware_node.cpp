@@ -12,12 +12,16 @@ int main(int argc, char *argv[]) {
   ros::NodeHandle nh, pnh("~");
 
   usb_cam_hardware::USBCamHardware hardware;
+  if (!hardware.init(pnh)) {
+    ROS_ERROR("Cannot initialize the usb cam hardware");
+    return 1;
+  }
 
   controller_manager::ControllerManager controllers(&hardware, nh);
   ros::AsyncSpinner spinner(1);
   spinner.start();
 
-  ros::Rate control_rate(nh.param("fps", 30.));
+  ros::Rate control_rate(nh.param("framerate", 30));
   ros::Time last(ros::Time::now());
   while (ros::ok()) {
     const ros::Time now(ros::Time::now());
