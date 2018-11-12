@@ -14,7 +14,7 @@ namespace usb_cam_hardware_interface {
 //  - has reference to data
 class PacketHandle {
 public:
-  PacketHandle() : name_(NULL), stamp_(NULL), start_(NULL), length_(NULL) {}
+  PacketHandle() : name_(), stamp_(NULL), start_(NULL), length_(NULL) {}
   PacketHandle(const std::string &name, const ros::Time *const stamp, const void **const start,
                const std::size_t *const length)
       : name_(name), stamp_(stamp), start_(start), length_(length) {}
