@@ -14,7 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   pluginlib
-  realtime_tools
   roscpp
   sensor_msgs
   usb_cam_hardware_interface
@@ -119,7 +118,6 @@ catkin_package(
   cv_bridge
   image_transport
   pluginlib 
-  realtime_tools 
   roscpp 
   sensor_msgs 
   usb_cam_hardware_interface

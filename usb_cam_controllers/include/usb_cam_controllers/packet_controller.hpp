@@ -5,16 +5,13 @@
 #include <vector>
 
 #include <controller_interface/controller.h>
-#include <realtime_tools/realtime_publisher.h>
 #include <ros/console.h>
 #include <ros/duration.h>
 #include <ros/node_handle.h>
+#include <ros/publisher.h>
 #include <ros/time.h>
 #include <sensor_msgs/CompressedImage.h>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
-
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
 namespace usb_cam_controllers {
 
@@ -43,7 +40,7 @@ public:
     }
 
     packet_ = hw->getHandle(names.front());
-    publisher_ = boost::make_shared< Publisher >(root_nh, names.front(), 1);
+    publisher_ = root_nh.advertise< sensor_msgs::CompressedImage >(names.front(), 1);
     last_stamp_ = ros::Time(0);
 
     return true;
@@ -64,18 +61,13 @@ public:
       return;
     }
 
-    // try own the publisher
-    if (!publisher_->trylock()) {
-      ROS_WARN_STREAM("Cannot own the packet publisher");
-      return;
-    }
-
     // publish the packet
-    publisher_->msg_.header.stamp = packet_.getStamp();
-    publisher_->msg_.format = format_;
-    publisher_->msg_.data.assign(packet_.getStartAs< uint8_t >(),
-                                 packet_.getStartAs< uint8_t >() + packet_.getLength());
-    publisher_->unlockAndPublish();
+    const sensor_msgs::CompressedImagePtr msg(new sensor_msgs::CompressedImage());
+    msg->header.stamp = packet_.getStamp();
+    msg->format = format_;
+    msg->data.assign(packet_.getStartAs< uint8_t >(),
+                     packet_.getStartAs< uint8_t >() + packet_.getLength());
+    publisher_.publish(msg);
     last_stamp_ = packet_.getStamp();
   }
 
@@ -84,12 +76,10 @@ public:
   }
 
 private:
-  typedef realtime_tools::RealtimePublisher< sensor_msgs::CompressedImage > Publisher;
-
   std::string format_;
 
   usb_cam_hardware_interface::PacketHandle packet_;
-  boost::shared_ptr< Publisher > publisher_;
+  ros::Publisher publisher_;
   ros::Time last_stamp_;
 };
 

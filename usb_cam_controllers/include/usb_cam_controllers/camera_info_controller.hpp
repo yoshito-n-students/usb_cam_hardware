@@ -6,7 +6,6 @@
 
 #include <camera_info_manager/camera_info_manager.h>
 #include <controller_interface/controller.h>
-#include <realtime_tools/realtime_publisher.h>
 #include <ros/duration.h>
 #include <ros/node_handle.h>
 #include <ros/time.h>
@@ -43,7 +42,7 @@ public:
     }
 
     packet_ = hw->getHandle(names.front());
-    publisher_ = boost::make_shared< Publisher >(root_nh, "camera_info", 1);
+    publisher_ = root_nh.advertise< sensor_msgs::CameraInfo >("camera_info", 1);
     info_manager_ = boost::make_shared< camera_info_manager::CameraInfoManager >(
         root_nh, controller_nh.param< std::string >("camera_name", "head_camera"),
         controller_nh.param< std::string >("camera_info_url", ""));
@@ -67,17 +66,12 @@ public:
       return;
     }
 
-    // try own the publisher
-    if (!publisher_->trylock()) {
-      ROS_WARN_STREAM("Cannot own the camera info publisher");
-      return;
-    }
-
     // publish the camera info
-    publisher_->msg_ = info_manager_->getCameraInfo();
-    publisher_->msg_.header.stamp = packet_.getStamp();
-    publisher_->msg_.header.frame_id = frame_id_;
-    publisher_->unlockAndPublish();
+    const sensor_msgs::CameraInfoPtr msg(new sensor_msgs::CameraInfo());
+    *msg = info_manager_->getCameraInfo();
+    msg->header.stamp = packet_.getStamp();
+    msg->header.frame_id = frame_id_;
+    publisher_.publish(msg);
     last_stamp_ = packet_.getStamp();
   }
 
@@ -86,12 +80,10 @@ public:
   }
 
 private:
-  typedef realtime_tools::RealtimePublisher< sensor_msgs::CameraInfo > Publisher;
-
   std::string frame_id_;
 
   usb_cam_hardware_interface::PacketHandle packet_;
-  boost::shared_ptr< Publisher > publisher_;
+  ros::Publisher publisher_;
   boost::shared_ptr< camera_info_manager::CameraInfoManager > info_manager_;
   ros::Time last_stamp_;
 };
