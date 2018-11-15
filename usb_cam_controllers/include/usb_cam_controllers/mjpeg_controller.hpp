@@ -14,6 +14,8 @@
 #include <ros/time.h>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
+#include <opencv2/core/core.hpp>
+
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavutil/avutil.h>
@@ -25,11 +27,15 @@ namespace usb_cam_controllers {
 class MjpegController
     : public controller_interface::Controller< usb_cam_hardware_interface::PacketInterface > {
 public:
-  MjpegController() {}
+  MjpegController()
+      : av_decoder_(NULL), av_context_(NULL), av_frame_raw_(NULL), av_frame_rgb_(NULL),
+        av_packet_(NULL), sws_context_(NULL) {}
 
   virtual ~MjpegController() {
+    sws_freeContext(sws_context_);
     avcodec_free_context(&av_context_);
-    av_frame_free(&av_frame_);
+    av_frame_free(&av_frame_raw_);
+    av_frame_free(&av_frame_rgb_);
     av_packet_free(&av_packet_);
   }
 
@@ -78,7 +84,8 @@ public:
       return false;
     }
     av_packet_ = av_packet_alloc();
-    av_frame_ = av_frame_alloc();
+    av_frame_raw_ = av_frame_alloc();
+    av_frame_rgb_ = av_frame_alloc();
 
     //
     // setup image publisher
@@ -112,18 +119,35 @@ public:
       ROS_ERROR("Cannot send packet to decoder");
       return;
     }
-    if (avcodec_receive_frame(av_context_, av_frame_) < 0) {
+    if (avcodec_receive_frame(av_context_, av_frame_raw_) < 0) {
       ROS_ERROR("Cannot receive frame from decoder");
       return;
     }
 
-    // TODO: convert color spaces of the frame
+    // TODO: convert pixel formats of frame
+    sws_context_ =
+        sws_getCachedContext(sws_context_,
+                             // from
+                             av_frame_raw_->width, av_frame_raw_->height,
+                             static_cast< AVPixelFormat >(av_frame_raw_->format),
+                             // to
+                             av_frame_raw_->width, av_frame_raw_->height, AV_PIX_FMT_RGB24,
+                             // how
+                             0, NULL, NULL, NULL);
+    sws_scale(sws_context_,
+              // from
+              av_frame_raw_->data, av_frame_raw_->linesize, 0, av_frame_raw_->height,
+              // to
+              av_frame_rgb_->data, av_frame_rgb_->linesize);
+    av_frame_rgb_->width = av_frame_raw_->width;
+    av_frame_rgb_->height = av_frame_raw_->height;
 
     // publish the frame
     cv_bridge::CvImage image;
     image.header.stamp = packet_.getStamp();
     image.encoding = encoding_;
-    // image.image = ;
+    image.image =
+        cv::Mat(av_frame_rgb_->height, av_frame_rgb_->width, CV_8UC3, av_frame_rgb_->data);
     publisher_.publish(image.toImageMsg());
     last_stamp_ = packet_.getStamp();
   }
@@ -137,8 +161,9 @@ private:
 
   AVCodec *av_decoder_;
   AVCodecContext *av_context_;
-  AVFrame *av_frame_;
+  AVFrame *av_frame_raw_, *av_frame_rgb_;
   AVPacket *av_packet_;
+  SwsContext *sws_context_;
 
   usb_cam_hardware_interface::PacketHandle packet_;
   image_transport::Publisher publisher_;
