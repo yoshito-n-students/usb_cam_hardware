@@ -14,8 +14,11 @@
 #include <ros/time.h>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
+extern "C" {
+#include <libavcodec/avcodec.h>
+#include <libavutil/avutil.h>
+#include <libswscale/swscale.h>
+}
 
 namespace usb_cam_controllers {
 
@@ -24,9 +27,23 @@ class MjpegController
 public:
   MjpegController() {}
 
+  virtual ~MjpegController() {
+    avcodec_free_context(&av_context_);
+    av_frame_free(&av_frame_);
+    av_packet_free(&av_packet_);
+  }
+
   virtual bool init(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                     ros::NodeHandle &controller_nh) {
+    //
+    // load parameters
+    //
+
     encoding_ = controller_nh.param< std::string >("encoding", "bgr8");
+
+    //
+    // get hardware handle
+    //
 
     if (!hw) {
       ROS_ERROR("Null packet interface");
@@ -44,6 +61,29 @@ public:
     }
 
     packet_ = hw->getHandle(names.front());
+
+    //
+    // setup mjpeg decoder
+    //
+
+    avcodec_register_all();
+    av_decoder_ = avcodec_find_decoder(AV_CODEC_ID_MJPEG);
+    if (!av_decoder_) {
+      ROS_ERROR("Cannot find mjpeg decoder");
+      return false;
+    }
+    av_context_ = avcodec_alloc_context3(av_decoder_);
+    if (avcodec_open2(av_context_, av_decoder_, 0) < 0) {
+      ROS_ERROR("Cannot open mjpeg decoder");
+      return false;
+    }
+    av_packet_ = av_packet_alloc();
+    av_frame_ = av_frame_alloc();
+
+    //
+    // setup image publisher
+    //
+
     publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
     last_stamp_ = ros::Time(0);
 
@@ -65,12 +105,25 @@ public:
       return;
     }
 
-    // publish the packet
+    // decode the packet and get a frame
+    av_packet_->data = const_cast< uint8_t * >(packet_.getStartAs< uint8_t >());
+    av_packet_->size = packet_.getLength();
+    if (avcodec_send_packet(av_context_, av_packet_) < 0) {
+      ROS_ERROR("Cannot send packet to decoder");
+      return;
+    }
+    if (avcodec_receive_frame(av_context_, av_frame_) < 0) {
+      ROS_ERROR("Cannot receive frame from decoder");
+      return;
+    }
+
+    // TODO: convert color spaces of the frame
+
+    // publish the frame
     cv_bridge::CvImage image;
     image.header.stamp = packet_.getStamp();
     image.encoding = encoding_;
-    image.image = cv::imdecode(cv::_InputArray(packet_.getStart(), packet_.getLength()),
-                               -1 /* decode the data as is */);
+    // image.image = ;
     publisher_.publish(image.toImageMsg());
     last_stamp_ = packet_.getStamp();
   }
@@ -81,6 +134,11 @@ public:
 
 private:
   std::string encoding_;
+
+  AVCodec *av_decoder_;
+  AVCodecContext *av_context_;
+  AVFrame *av_frame_;
+  AVPacket *av_packet_;
 
   usb_cam_hardware_interface::PacketHandle packet_;
   image_transport::Publisher publisher_;
