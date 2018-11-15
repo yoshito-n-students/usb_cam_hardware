@@ -124,20 +124,20 @@ public:
       return;
     }
 
-    // TODO: convert pixel formats of frame
+    // convert pixel formats of frame
     sws_context_ =
         sws_getCachedContext(sws_context_,
-                             // from
+                             // src format (= raw frame)
                              av_frame_raw_->width, av_frame_raw_->height,
                              static_cast< AVPixelFormat >(av_frame_raw_->format),
-                             // to
+                             // dst format (24bit RGB)
                              av_frame_raw_->width, av_frame_raw_->height, AV_PIX_FMT_RGB24,
-                             // how
+                             // flags and filters (nothing)
                              0, NULL, NULL, NULL);
     sws_scale(sws_context_,
-              // from
+              // src data
               av_frame_raw_->data, av_frame_raw_->linesize, 0, av_frame_raw_->height,
-              // to
+              // dst data
               av_frame_rgb_->data, av_frame_rgb_->linesize);
     av_frame_rgb_->width = av_frame_raw_->width;
     av_frame_rgb_->height = av_frame_raw_->height;
