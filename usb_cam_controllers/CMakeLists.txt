@@ -20,7 +20,10 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+find_package(OpenCV REQUIRED COMPONENTS 
+  core
+  imgcodecs
+)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -165,6 +168,7 @@ add_library(
 target_link_libraries(
   usb_cam_controllers
   ${catkin_LIBRARIES}
+  ${OpenCV_LIBRARIES}
 )
 
 #############
