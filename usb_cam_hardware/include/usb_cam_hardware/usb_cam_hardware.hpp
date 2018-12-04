@@ -25,8 +25,9 @@ namespace usb_cam_hardware {
 class USBCamHardware : public hardware_interface::RobotHW {
 public:
   USBCamHardware() : fd_(-1) {}
+
   virtual ~USBCamHardware() {
-    // TODO: stop streaming and close device
+    uninit();
   }
 
   bool init(ros::NodeHandle param_nh) {
@@ -235,6 +236,35 @@ public:
   }
 
 private:
+  bool uninit() {
+    // stop streaming
+    {
+      v4l2_buf_type buf_type;
+      buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+      if (xioctl(fd_, VIDIOC_STREAMOFF, &buf_type) < 0) {
+        ROS_ERROR("Cannot stop streaming");
+        return false;
+      }
+    }
+
+    // unmap memory
+    for (Buffer &buffer : buffers_) {
+      if (munmap(buffer.start, buffer.length) < 0) {
+        ROS_ERROR("Cannot unmap memory");
+        return false;
+      }
+    }
+    buffers_.clear();
+
+    // close device
+    if (close(fd_) < 0) {
+      ROS_ERROR("Cannot close the device");
+      return false;
+    }
+
+    return true;
+  }
+
   static int xioctl(int fd, int request, void *arg) {
     int result;
     do {
@@ -252,7 +282,7 @@ private:
     int buffer_index;
   };
   struct Buffer {
-    const void *start;
+    void *start;
     std::size_t length;
   };
 
