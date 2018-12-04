@@ -40,7 +40,7 @@ public:
     }
 
     packet_ = hw->getHandle(names.front());
-    publisher_ = root_nh.advertise< sensor_msgs::CompressedImage >(names.front(), 1);
+    publisher_ = controller_nh.advertise< sensor_msgs::CompressedImage >("packet", 1);
     last_stamp_ = ros::Time(0);
 
     return true;

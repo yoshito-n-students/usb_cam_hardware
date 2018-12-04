@@ -42,9 +42,9 @@ public:
     }
 
     packet_ = hw->getHandle(names.front());
-    publisher_ = root_nh.advertise< sensor_msgs::CameraInfo >("camera_info", 1);
+    publisher_ = controller_nh.advertise< sensor_msgs::CameraInfo >("camera_info", 1);
     info_manager_ = boost::make_shared< camera_info_manager::CameraInfoManager >(
-        root_nh, controller_nh.param< std::string >("camera_name", "head_camera"),
+        controller_nh, controller_nh.param< std::string >("camera_name", "head_camera"),
         controller_nh.param< std::string >("camera_info_url", ""));
     last_stamp_ = ros::Time(0);
 
