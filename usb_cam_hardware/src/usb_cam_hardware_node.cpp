@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
   }
 
   controller_manager::ControllerManager controllers(&hardware, nh);
-  ros::AsyncSpinner spinner(1);
+  ros::AsyncSpinner spinner(1); // to exec callbacks of controller management services
   spinner.start();
 
   ros::Rate control_rate(nh.param("framerate", 30));
