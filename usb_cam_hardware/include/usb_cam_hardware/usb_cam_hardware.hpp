@@ -26,9 +26,7 @@ class USBCamHardware : public hardware_interface::RobotHW {
 public:
   USBCamHardware() : fd_(-1) {}
 
-  virtual ~USBCamHardware() {
-    uninit();
-  }
+  virtual ~USBCamHardware() { uninit(); }
 
   bool init(ros::NodeHandle param_nh) {
     // register the packet buffer to the interface so that controllers can see the packet
