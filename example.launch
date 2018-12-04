@@ -3,9 +3,9 @@
   <group ns="usb_cam">
 
     <node name="hardware" pkg="usb_cam_hardware" type="usb_cam_hardware_node" output="screen">
-      <param name="video_device" value="/dev/video0"/>
-      <param name="image_width" value="640"/>
-      <param name="image_height" value="480"/>
+      <param name="video_device" value="/dev/video1"/>
+      <param name="image_width" value="1472"/>
+      <param name="image_height" value="736"/>
       <param name="pixel_format" value="mjpeg"/>
       <param name="framerate" value="30"/>
     </node>
