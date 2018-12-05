@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
   ros::AsyncSpinner spinner(1); // to exec callbacks of controller management services
   spinner.start();
 
-  ros::Rate control_rate(nh.param("framerate", 30));
+  ros::Rate control_rate(pnh.param("framerate", 30));
   ros::Time last(ros::Time::now());
   while (ros::ok()) {
     const ros::Time now(ros::Time::now());
