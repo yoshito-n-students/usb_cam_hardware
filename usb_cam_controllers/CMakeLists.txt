@@ -169,6 +169,8 @@ target_link_libraries(
   usb_cam_controllers
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
+  avcodec 
+  swscale
 )
 
 #############

@@ -8,6 +8,14 @@
     </description>
   </class>
 
+  <class name="usb_cam_controllers/H264Controller" type="usb_cam_controllers::H264Controller" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      This controller publishes images by decoding h264-encoded packets read by the hardware. 
+      The controller expects a usb_cam_hardware_interface::PacketInterface as hardware interface.
+    </description>
+  </class>
+
   <class name="usb_cam_controllers/MjpegController" type="usb_cam_controllers::MjpegController" 
          base_class_type="controller_interface::ControllerBase">
     <description>
