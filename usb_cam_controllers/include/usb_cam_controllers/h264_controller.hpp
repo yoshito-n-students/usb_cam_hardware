@@ -52,6 +52,8 @@ protected:
       return false;
     }
 
+    encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
+
     return true;
   }
 
@@ -95,7 +97,7 @@ protected:
       out->header.stamp = packet_iface_.getStamp();
       out->height = frame->height;
       out->width = frame->width;
-      out->encoding = sensor_msgs::image_encodings::BGR8;
+      out->encoding = encoding_;
       out->step = 3 * frame->width;
       out->data.resize(3 * frame->width * frame->height);
 
@@ -148,6 +150,8 @@ private:
   };
 
 private:
+  std::string encoding_;
+
   boost::shared_ptr< AVCodecContext > decoder_ctx_;
   image_transport::Publisher publisher_;
 };
