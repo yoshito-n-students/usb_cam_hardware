@@ -52,6 +52,8 @@ protected:
       return false;
     }
 
+    encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
+
     // init publisher for decoded images
     publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
 
@@ -145,6 +147,8 @@ private:
   };
 
 private:
+  std::string encoding_;
+
   boost::shared_ptr< AVCodecContext > decoder_ctx_;
   image_transport::Publisher publisher_;
 };
