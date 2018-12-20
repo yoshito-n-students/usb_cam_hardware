@@ -23,7 +23,9 @@ protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                         ros::NodeHandle &controller_nh) {
     format_ = controller_nh.param< std::string >("format", "");
+    skip_max_ = std::max(controller_nh.param("skip", /* pub every packet */ 0), 0);
 
+    skip_cnt_ = skip_max_;
     publisher_ = controller_nh.advertise< sensor_msgs::CompressedImage >("packet", 1);
 
     return true;
@@ -34,13 +36,22 @@ protected:
   }
 
   virtual void updateImpl(const ros::Time &time, const ros::Duration &period) {
-    // publish the packet
-    const sensor_msgs::CompressedImagePtr msg(new sensor_msgs::CompressedImage());
-    msg->header.stamp = packet_iface_.getStamp();
-    msg->format = format_;
-    msg->data.assign(packet_iface_.getStartAs< uint8_t >(),
-                     packet_iface_.getStartAs< uint8_t >() + packet_iface_.getLength());
-    publisher_.publish(msg);
+    // publish the current packet if enough number of previous packets are skipped
+    if (skip_cnt_ == skip_max_) {
+      // reset skip count
+      skip_cnt_ = 0;
+
+      // publish the packet
+      const sensor_msgs::CompressedImagePtr msg(new sensor_msgs::CompressedImage());
+      msg->header.stamp = packet_iface_.getStamp();
+      msg->format = format_;
+      msg->data.assign(packet_iface_.getStartAs< uint8_t >(),
+                       packet_iface_.getStartAs< uint8_t >() + packet_iface_.getLength());
+      publisher_.publish(msg);
+    } else {
+      // increment skip count if the current packet is skipped
+      ++skip_cnt_;
+    }
   }
 
   virtual void stoppingImpl(const ros::Time &time) {
@@ -49,7 +60,9 @@ protected:
 
 private:
   std::string format_;
+  int skip_max_;
 
+  int skip_cnt_;
   ros::Publisher publisher_;
 };
 
