@@ -9,6 +9,7 @@
 #include <ros/duration.h>
 #include <ros/node_handle.h>
 #include <ros/time.h>
+#include <sensor_msgs/image_encodings.h>
 #include <usb_cam_controllers/simple_packet_controller.hpp>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
@@ -26,7 +27,7 @@ public:
 protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                         ros::NodeHandle &controller_nh) {
-    encoding_ = controller_nh.param< std::string >("encoding", "bgr8");
+    encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
 
     publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
 
