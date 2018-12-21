@@ -26,6 +26,8 @@
 
     <param name="packet_controller/type" value="usb_cam_controllers/PacketController"/>
     <param name="packet_controller/format" value="jpeg"/>
+    <!-- pub 1 packet and then skip 2 packets -->
+    <param name="packet_controller/skip" value="2"/>
 
   </group>
 
