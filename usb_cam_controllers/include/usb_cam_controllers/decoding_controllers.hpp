@@ -1,5 +1,5 @@
-#ifndef USB_CAM_CONTROLLERS_VIDEO_CONTROLLERS
-#define USB_CAM_CONTROLLERS_VIDEO_CONTROLLERS
+#ifndef USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
+#define USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
@@ -19,11 +19,11 @@ extern "C" {
 
 namespace usb_cam_controllers {
 
-template < AVCodecID CodecId > class VideoController : public SimplePacketController {
+template < AVCodecID CodecId > class DecodingController : public SimplePacketController {
 public:
-  VideoController() {}
+  DecodingController() {}
 
-  virtual ~VideoController() {}
+  virtual ~DecodingController() {}
 
 protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
@@ -175,8 +175,8 @@ private:
   image_transport::Publisher publisher_;
 };
 
-typedef VideoController< AV_CODEC_ID_H264 > H264Controller;
-typedef VideoController< AV_CODEC_ID_MJPEG > MjpegController;
+typedef DecodingController< AV_CODEC_ID_H264 > H264Controller;
+typedef DecodingController< AV_CODEC_ID_MJPEG > MjpegController;
 
 } // namespace usb_cam_controllers
 
