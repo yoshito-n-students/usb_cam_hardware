@@ -1,5 +1,5 @@
-#ifndef USB_CAM_CONTROLLERS_H264_CONTROLLER
-#define USB_CAM_CONTROLLERS_H264_CONTROLLER
+#ifndef USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
+#define USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
@@ -19,11 +19,11 @@ extern "C" {
 
 namespace usb_cam_controllers {
 
-class H264Controller : public SimplePacketController {
+template < AVCodecID CodecId > class DecodingController : public SimplePacketController {
 public:
-  H264Controller() {}
+  DecodingController() {}
 
-  virtual ~H264Controller() {}
+  virtual ~DecodingController() {}
 
 protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
@@ -33,22 +33,22 @@ protected:
     av_log_set_level(AV_LOG_FATAL);
 
     // find h264 decoder
-    AVCodec *const decoder(avcodec_find_decoder(AV_CODEC_ID_H264));
+    AVCodec *const decoder(avcodec_find_decoder(CodecId));
     if (!decoder) {
-      ROS_ERROR("Cannot find h264 decoder");
+      ROS_ERROR_STREAM("Cannot find the decoder (codec id: " << CodecId << ")");
       return false;
     }
 
     // allocate h264 decoder context
     decoder_ctx_.reset(avcodec_alloc_context3(decoder), AVDeleter());
     if (!decoder_ctx_) {
-      ROS_ERROR("Cannot allocate h264 decoder context");
+      ROS_ERROR_STREAM("Cannot allocate a decoder context (codec id: " << CodecId << ")");
       return false;
     }
 
     // open decoder
     if (avcodec_open2(decoder_ctx_.get(), decoder, NULL) < 0) {
-      ROS_ERROR("Failed to open h264 codec");
+      ROS_ERROR_STREAM("Failed to open the codec (codec id: " << CodecId << ")");
       return false;
     }
 
@@ -146,12 +146,33 @@ private:
     }
   };
 
+  // Workaround to avoid deprecated pixel format warning
+  static AVPixelFormat toUndeprecated(const AVPixelFormat format) {
+    switch (format) {
+    case AV_PIX_FMT_YUVJ420P:
+      return AV_PIX_FMT_YUV420P;
+    case AV_PIX_FMT_YUVJ411P:
+      return AV_PIX_FMT_YUV411P;
+    case AV_PIX_FMT_YUVJ422P:
+      return AV_PIX_FMT_YUV422P;
+    case AV_PIX_FMT_YUVJ440P:
+      return AV_PIX_FMT_YUV440P;
+    case AV_PIX_FMT_YUVJ444P:
+      return AV_PIX_FMT_YUV444P;
+    default:
+      return format;
+    }
+  }
+
 private:
   std::string encoding_;
 
   boost::shared_ptr< AVCodecContext > decoder_ctx_;
   image_transport::Publisher publisher_;
 };
+
+typedef DecodingController< AV_CODEC_ID_H264 > H264Controller;
+typedef DecodingController< AV_CODEC_ID_MJPEG > MjpegController;
 
 } // namespace usb_cam_controllers
 
