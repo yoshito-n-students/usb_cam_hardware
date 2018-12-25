@@ -1,0 +1,30 @@
+<launch>
+
+  <group ns="usb_cam">
+
+    <!-- USB camera driver + controller manager -->
+    <node name="hardware" pkg="usb_cam_hardware" type="usb_cam_hardware_node" output="screen">
+      <remap from="camera_info_controller/camera_info" to="camera_info"/>
+      <remap from="yuyv_controller/image" to="image"/>
+      <param name="video_device" value="/dev/video1"/>
+      <param name="image_width" value="640"/>
+      <param name="image_height" value="480"/>
+      <param name="pixel_format" value="yuyv"/>
+      <param name="framerate" value="30"/>
+    </node>
+
+    <!-- Controller starter that ask the manager to start -->
+    <node name="controller_starter" pkg="controller_manager" type="controller_manager" 
+          args="spawn camera_info_controller yuyv_controller" output="screen"/>
+
+    <!-- Parameters for controllers -->
+    <param name="camera_info_controller/type" value="usb_cam_controllers/CameraInfoController"/>
+    <param name="camera_info_controller/camera_frame_id" value="insta360"/>
+
+    <param name="yuyv_controller/type" value="usb_cam_controllers/YUYVController"/>
+    <param name="yuyv_controller/image_width" value="640"/>
+    <param name="yuyv_controller/image_height" value="480"/>
+
+  </group>
+
+</launch>
