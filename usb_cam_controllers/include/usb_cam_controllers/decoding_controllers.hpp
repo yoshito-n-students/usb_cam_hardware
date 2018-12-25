@@ -89,7 +89,7 @@ protected:
         out->header.stamp = packet_iface_.getStamp();
         out->height = frame->height;
         out->width = frame->width;
-        out->encoding = sensor_msgs::image_encodings::BGR8;
+        out->encoding = encoding_;
         out->step = 3 * frame->width;
         out->data.resize(3 * frame->width * frame->height);
 
@@ -97,7 +97,8 @@ protected:
         boost::shared_ptr< SwsContext > convert_ctx(
             sws_getContext(
                 // src formats
-                frame->width, frame->height, AV_PIX_FMT_YUV420P,
+                frame->width, frame->height,
+                toUndeprecated(static_cast< AVPixelFormat >(frame->format)),
                 // dst formats
                 frame->width, frame->height, AV_PIX_FMT_BGR24,
                 // flags & filters
