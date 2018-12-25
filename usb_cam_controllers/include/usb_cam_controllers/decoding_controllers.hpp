@@ -1,5 +1,5 @@
-#ifndef USB_CAM_CONTROLLERS_H264_CONTROLLER
-#define USB_CAM_CONTROLLERS_H264_CONTROLLER
+#ifndef USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
+#define USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
@@ -19,11 +19,11 @@ extern "C" {
 
 namespace usb_cam_controllers {
 
-class H264Controller : public SimplePacketController {
+template < AVCodecID CodecId > class DecodingController : public SimplePacketController {
 public:
-  H264Controller() {}
+  DecodingController() {}
 
-  virtual ~H264Controller() {}
+  virtual ~DecodingController() {}
 
 protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
@@ -33,22 +33,22 @@ protected:
     av_log_set_level(AV_LOG_FATAL);
 
     // find h264 decoder
-    AVCodec *const decoder(avcodec_find_decoder(AV_CODEC_ID_H264));
+    AVCodec *const decoder(avcodec_find_decoder(CodecId));
     if (!decoder) {
-      ROS_ERROR("Cannot find h264 decoder");
+      ROS_ERROR_STREAM("Cannot find the decoder (codec id: " << CodecId << ")");
       return false;
     }
 
     // allocate h264 decoder context
-    decoder_ctx_.reset(avcodec_alloc_context3(decoder), AVDeleter());
+    decoder_ctx_.reset(avcodec_alloc_context3(decoder), deleteAVCodecContext);
     if (!decoder_ctx_) {
-      ROS_ERROR("Cannot allocate h264 decoder context");
+      ROS_ERROR_STREAM("Cannot allocate a decoder context (codec id: " << CodecId << ")");
       return false;
     }
 
     // open decoder
     if (avcodec_open2(decoder_ctx_.get(), decoder, NULL) < 0) {
-      ROS_ERROR("Failed to open h264 codec");
+      ROS_ERROR_STREAM("Failed to open the codec (codec id: " << CodecId << ")");
       return false;
     }
 
@@ -70,15 +70,15 @@ protected:
 
     // send the packet to the decoder
     if (avcodec_send_packet(decoder_ctx_.get(), &packet) < 0) {
-      ROS_ERROR("Cannot send h264 packet to decoder");
+      ROS_ERROR_STREAM("Cannot send a packet to decoder (codec id: " << CodecId << ")");
       return;
     }
 
     while (true) {
       // allocate a frame for decoded data
-      boost::shared_ptr< AVFrame > frame(av_frame_alloc(), AVDeleter());
+      boost::shared_ptr< AVFrame > frame(av_frame_alloc(), deleteAVFrame);
       if (!frame) {
-        ROS_ERROR("Cannot allocate frame");
+        ROS_ERROR_STREAM("Cannot allocate a frame");
         return;
       }
 
@@ -88,7 +88,7 @@ protected:
         // no more frames in the packet
         return;
       } else if (res < 0) {
-        ROS_ERROR("Cannot receive h264 frame");
+        ROS_ERROR("Cannot receive a frame");
         return;
       }
 
@@ -102,15 +102,16 @@ protected:
       out->data.resize(3 * frame->width * frame->height);
 
       // layout data by converting color spaces (YUV -> RGB)
-      boost::shared_ptr< SwsContext > convert_ctx(sws_getContext(
-                                                      // src formats
-                                                      frame->width, frame->height,
-                                                      AV_PIX_FMT_YUV420P,
-                                                      // dst formats
-                                                      frame->width, frame->height, AV_PIX_FMT_BGR24,
-                                                      // flags & filters
-                                                      SWS_FAST_BILINEAR, NULL, NULL, NULL),
-                                                  AVDeleter());
+      boost::shared_ptr< SwsContext > convert_ctx(
+          sws_getContext(
+              // src formats
+              frame->width, frame->height,
+              toUndeprecated(static_cast< AVPixelFormat >(frame->format)),
+              // dst formats
+              frame->width, frame->height, AV_PIX_FMT_BGR24,
+              // flags & filters
+              SWS_FAST_BILINEAR, NULL, NULL, NULL),
+          sws_freeContext);
       int stride = 3 * frame->width;
       uint8_t *dst = &out->data[0];
       sws_scale(convert_ctx.get(),
@@ -129,25 +130,35 @@ protected:
 
 private:
   // Deleter for auto free/close of libav objects
-  struct AVDeleter {
-    void operator()(AVFrame *frame) {
-      if (frame) {
-        av_frame_free(&frame);
-      }
+  static void deleteAVFrame(AVFrame *frame) {
+    if (frame) {
+      av_frame_free(&frame);
     }
+  }
 
-    void operator()(AVCodecContext *ctx) {
-      if (ctx) {
-        avcodec_free_context(&ctx);
-      }
+  static void deleteAVCodecContext(AVCodecContext *ctx) {
+    if (ctx) {
+      avcodec_free_context(&ctx);
     }
+  }
 
-    void operator()(SwsContext *ctx) {
-      if (ctx) {
-        sws_freeContext(ctx);
-      }
+  // Workaround to avoid deprecated pixel format warning
+  static AVPixelFormat toUndeprecated(const AVPixelFormat format) {
+    switch (format) {
+    case AV_PIX_FMT_YUVJ420P:
+      return AV_PIX_FMT_YUV420P;
+    case AV_PIX_FMT_YUVJ411P:
+      return AV_PIX_FMT_YUV411P;
+    case AV_PIX_FMT_YUVJ422P:
+      return AV_PIX_FMT_YUV422P;
+    case AV_PIX_FMT_YUVJ440P:
+      return AV_PIX_FMT_YUV440P;
+    case AV_PIX_FMT_YUVJ444P:
+      return AV_PIX_FMT_YUV444P;
+    default:
+      return format;
     }
-  };
+  }
 
 private:
   std::string encoding_;
@@ -155,6 +166,9 @@ private:
   boost::shared_ptr< AVCodecContext > decoder_ctx_;
   image_transport::Publisher publisher_;
 };
+
+typedef DecodingController< AV_CODEC_ID_H264 > H264Controller;
+typedef DecodingController< AV_CODEC_ID_MJPEG > MjpegController;
 
 } // namespace usb_cam_controllers
 
