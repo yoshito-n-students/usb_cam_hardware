@@ -55,6 +55,9 @@ protected:
 
     encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
 
+    // init publisher for decoded images
+    publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
+
     return true;
   }
 
