@@ -1,17 +1,17 @@
 #ifndef USB_CAM_CONTROLLERS_FORMAT_CONTROLLERS
 #define USB_CAM_CONTROLLERS_FORMAT_CONTROLLERS
 
+#include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
 #include <ros/console.h>
 #include <ros/duration.h>
 #include <ros/node_handle.h>
 #include <ros/time.h>
-#include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <usb_cam_controllers/simple_packet_controller.hpp>
-#include <usb_cam_hardware_interface/packet_interface.hpp>
 
+#include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 
 namespace usb_cam_controllers {
@@ -30,6 +30,9 @@ protected:
     height_ = controller_nh.param("image_height", 480);
     encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
 
+    // init publisher for decoded images
+    publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
+
     return true;
   }
 
@@ -39,18 +42,21 @@ protected:
 
   virtual void updateImpl(const ros::Time &time, const ros::Duration &period) {
     // allocate output message
-    const sensor_msgs::ImagePtr out(new sensor_msgs::Image());
-    out->header.stamp = packet_iface_.getStamp();
-    out->height = height_;
-    out->width = width_;
-    out->encoding = encoding_;
-    out->step = 3 * width_;
+    cv_bridge::CvImage out;
+    out.header.stamp = packet_iface_.getStamp();
+    out.encoding = encoding_;
 
-    // convert pixel formats. dst format must be one of 24-bit RGB (BGR, RGB, etc)
-    cv::cvtColor(cv::_InputArray(packet_iface_.getStartAs< uint8_t >(), packet_iface_.getLength()),
-                 out->data, ConversionCode);
+    // convert pixel formats
+    try {
+      cv::cvtColor(cv::Mat(height_, width_, CV_8UC(packet_iface_.getLength() / (height_ * width_)),
+                           const_cast< uint8_t * >(packet_iface_.getStartAs< uint8_t >())),
+                   out.image, ConversionCode);
+    } catch (const cv::Exception &ex) {
+      ROS_ERROR_STREAM(ex.what());
+      return;
+    }
 
-    publisher_.publish(out);
+    publisher_.publish(out.toImageMsg());
   }
 
   virtual void stoppingImpl(const ros::Time &time) {
