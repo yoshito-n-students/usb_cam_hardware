@@ -79,11 +79,27 @@ converts uyvy-formatted packets to rgb images and publishes them
 #### Published topics
 **image** (sensor_msgs/Image)
 
+#### Parameters
+**~image_width** (int, default: 640)
+
+**~image_height** (int, default: 480)
+
+**encoding** (string, default: "bgr8")
+* value of Image::encoding
+
 ### yuyv_controller 
 converts yuyv-formatted packets to rgb images and publishes them
 
 #### Published topics
 **image** (sensor_msgs/Image)
+
+#### Parameters
+**~image_width** (int, default: 640)
+
+**~image_height** (int, default: 480)
+
+**encoding** (string, default: "bgr8")
+* value of Image::encoding
 
 ### Related ROS packages
 [h264_image_transport](https://github.com/yoshito-okada/h264_image_transport)
