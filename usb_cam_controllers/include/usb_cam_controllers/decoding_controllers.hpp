@@ -40,7 +40,7 @@ protected:
     }
 
     // allocate h264 decoder context
-    decoder_ctx_.reset(avcodec_alloc_context3(decoder), AVDeleter());
+    decoder_ctx_.reset(avcodec_alloc_context3(decoder), deleteAVCodecContext);
     if (!decoder_ctx_) {
       ROS_ERROR_STREAM("Cannot allocate a decoder context (codec id: " << CodecId << ")");
       return false;
@@ -76,7 +76,7 @@ protected:
 
     while (true) {
       // allocate a frame for decoded data
-      boost::shared_ptr< AVFrame > frame(av_frame_alloc(), AVDeleter());
+      boost::shared_ptr< AVFrame > frame(av_frame_alloc(), deleteAVFrame);
       if (!frame) {
         ROS_ERROR_STREAM("Cannot allocate a frame");
         return;
@@ -111,7 +111,7 @@ protected:
               frame->width, frame->height, AV_PIX_FMT_BGR24,
               // flags & filters
               SWS_FAST_BILINEAR, NULL, NULL, NULL),
-          AVDeleter());
+          sws_freeContext);
       int stride = 3 * frame->width;
       uint8_t *dst = &out->data[0];
       sws_scale(convert_ctx.get(),
@@ -130,25 +130,17 @@ protected:
 
 private:
   // Deleter for auto free/close of libav objects
-  struct AVDeleter {
-    void operator()(AVFrame *frame) {
-      if (frame) {
-        av_frame_free(&frame);
-      }
+  static void deleteAVFrame(AVFrame *frame) {
+    if (frame) {
+      av_frame_free(&frame);
     }
+  }
 
-    void operator()(AVCodecContext *ctx) {
-      if (ctx) {
-        avcodec_free_context(&ctx);
-      }
+  static void deleteAVCodecContext(AVCodecContext *ctx) {
+    if (ctx) {
+      avcodec_free_context(&ctx);
     }
-
-    void operator()(SwsContext *ctx) {
-      if (ctx) {
-        sws_freeContext(ctx);
-      }
-    }
-  };
+  }
 
   // Workaround to avoid deprecated pixel format warning
   static AVPixelFormat toUndeprecated(const AVPixelFormat format) {
