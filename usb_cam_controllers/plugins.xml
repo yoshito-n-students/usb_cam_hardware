@@ -32,7 +32,7 @@
     </description>
   </class>
 
-  <class name="usb_cam_controllers/UYVYController" type="usb_cam_controllers::PacketController" 
+  <class name="usb_cam_controllers/UYVYController" type="usb_cam_controllers::UYVYController" 
          base_class_type="controller_interface::ControllerBase">
     <description>
       This controller publishes images by converting pixel formats (UYVY -> 24bit RGB) 
@@ -40,7 +40,7 @@
     </description>
   </class>
 
-    <class name="usb_cam_controllers/YUYVController" type="usb_cam_controllers::PacketController" 
+    <class name="usb_cam_controllers/YUYVController" type="usb_cam_controllers::YUYVController" 
          base_class_type="controller_interface::ControllerBase">
     <description>
       This controller publishes images by converting pixel formats (YUYV -> 24bit RGB) 
