@@ -1,16 +1,15 @@
 #ifndef USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 #define USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 
+#include <cv_bridge/cv_bridge.h>
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
 #include <ros/console.h>
 #include <ros/duration.h>
 #include <ros/node_handle.h>
 #include <ros/time.h>
-#include <sensor_msgs/Image.h>
 #include <sensor_msgs/image_encodings.h>
 #include <usb_cam_controllers/simple_packet_controller.hpp>
-#include <usb_cam_hardware_interface/packet_interface.hpp>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
