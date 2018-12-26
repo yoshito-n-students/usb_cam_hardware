@@ -26,7 +26,7 @@ depends on [controllers](#Controllers)
 * All topics and parameters are defined in each controller's namespace
 * See example launch files to find how to use controllers
 
-### camera_info_controller
+### CameraInfoController
 publishes camera information syncronized to packets from the camera
 
 #### Published topics
@@ -39,7 +39,7 @@ publishes camera information syncronized to packets from the camera
 
 **camera_name** (string, default: "head_camera")
 
-### packet_controller
+### PacketController
 publishes raw packets from the camera without decoding them
 
 #### Published topics
@@ -53,19 +53,19 @@ publishes raw packets from the camera without decoding them
 * number of packets skipped after publishment
 * useful to throttle network usage
 
-### mjpeg_controller
+### MjpegController
 decodes mjpeg-compressed packets and publishes decoded images
 
 #### Published topics
 **image** (sensor_msgs/Image)
 
-### h264_controller
+### H264Controller
 decodes h264-compressed packets and publishes decoded images
 
 #### Published topics
 **image** (sensor_msgs/Image)
 
-### rgb24_controller
+### RGB24Controller
 converts rgb-formatted packets to bgr images and publishes them
 
 #### Published topics
@@ -76,7 +76,7 @@ converts rgb-formatted packets to bgr images and publishes them
 
 **~image_height** (int, default: 480)
 
-### uyvy_controller
+### UYVYController
 converts uyvy-formatted packets to bgr images and publishes them
 
 #### Published topics
@@ -87,7 +87,7 @@ converts uyvy-formatted packets to bgr images and publishes them
 
 **~image_height** (int, default: 480)
 
-### yuyv_controller 
+### YUYVController 
 converts yuyv-formatted packets to bgr images and publishes them
 
 #### Published topics
@@ -98,6 +98,6 @@ converts yuyv-formatted packets to bgr images and publishes them
 
 **~image_height** (int, default: 480)
 
-### Related ROS packages
+## Related ROS packages
 [h264_image_transport](https://github.com/yoshito-okada/h264_image_transport)
 * for subscriber-side decoding of h264 packets published by the packet_controller
