@@ -59,19 +59,11 @@ decodes mjpeg-compressed packets and publishes decoded images
 #### Published topics
 **image** (sensor_msgs/Image)
 
-#### Parameters
-**encoding** (string, default: "bgr8")
-* value of Image::encoding
-
 ### h264_controller
 decodes h264-compressed packets and publishes decoded images
 
 #### Published topics
 **image** (sensor_msgs/Image)
-
-#### Parameters
-**encoding** (string, default: "bgr8")
-* value of Image::encoding
 
 ### uyvy_controller
 converts uyvy-formatted packets to rgb images and publishes them
@@ -84,9 +76,6 @@ converts uyvy-formatted packets to rgb images and publishes them
 
 **~image_height** (int, default: 480)
 
-**encoding** (string, default: "bgr8")
-* value of Image::encoding
-
 ### yuyv_controller 
 converts yuyv-formatted packets to rgb images and publishes them
 
@@ -97,9 +86,6 @@ converts yuyv-formatted packets to rgb images and publishes them
 **~image_width** (int, default: 640)
 
 **~image_height** (int, default: 480)
-
-**encoding** (string, default: "bgr8")
-* value of Image::encoding
 
 ### Related ROS packages
 [h264_image_transport](https://github.com/yoshito-okada/h264_image_transport)
