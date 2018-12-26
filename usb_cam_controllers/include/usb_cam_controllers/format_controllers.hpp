@@ -71,6 +71,8 @@ private:
   image_transport::Publisher publisher_;
 };
 
+typedef FormatController< cv::COLOR_RGB2BGR, &sensor_msgs::image_encodings::BGR8 >
+    RGB24Controller;
 typedef FormatController< cv::COLOR_YUV2BGR_UYVY, &sensor_msgs::image_encodings::BGR8 >
     UYVYController;
 typedef FormatController< cv::COLOR_YUV2BGR_YUYV, &sensor_msgs::image_encodings::BGR8 >
