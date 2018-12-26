@@ -170,6 +170,7 @@ target_link_libraries(
   ${catkin_LIBRARIES}
   ${OpenCV_LIBRARIES}
   avcodec 
+  avutil
   swscale
 )
 
