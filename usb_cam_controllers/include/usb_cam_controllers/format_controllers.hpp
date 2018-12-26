@@ -16,7 +16,7 @@
 
 namespace usb_cam_controllers {
 
-template < cv::ColorConversionCodes ConversionCode >
+template < cv::ColorConversionCodes ConversionCode, const std::string *DstEncoding >
 class FormatController : public SimplePacketController {
 public:
   FormatController() {}
@@ -28,7 +28,6 @@ protected:
                         ros::NodeHandle &controller_nh) {
     width_ = controller_nh.param("image_width", 640);
     height_ = controller_nh.param("image_height", 480);
-    encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
 
     // init publisher for decoded images
     publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
@@ -44,7 +43,7 @@ protected:
     // allocate output message
     cv_bridge::CvImage out;
     out.header.stamp = packet_iface_.getStamp();
-    out.encoding = encoding_;
+    out.encoding = *DstEncoding;
 
     // convert pixel formats
     try {
@@ -64,14 +63,15 @@ protected:
   }
 
 private:
-  std::string encoding_;
   int height_, width_;
 
   image_transport::Publisher publisher_;
 }; // namespace usb_cam_controllers
 
-typedef FormatController< cv::COLOR_YUV2BGR_UYVY > UYVYController;
-typedef FormatController< cv::COLOR_YUV2BGR_YUYV > YUYVController;
+typedef FormatController< cv::COLOR_YUV2BGR_UYVY, &sensor_msgs::image_encodings::BGR8 >
+    UYVYController;
+typedef FormatController< cv::COLOR_YUV2BGR_YUYV, &sensor_msgs::image_encodings::BGR8 >
+    YUYVController;
 
 } // namespace usb_cam_controllers
 
