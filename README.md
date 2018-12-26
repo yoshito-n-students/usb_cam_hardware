@@ -18,7 +18,7 @@ depends on [controllers](#Controllers)
 **~image_height** (int, default: 480)
 
 **~pixel_format** (string, default: "mjpeg")
-* Possible values are mjpeg, h264, yuyv, uyvy
+* Possible values are mjpeg, h264, rgb24, yuyv, uyvy
 
 **~framerate** (int, default: 30)
 
@@ -65,8 +65,19 @@ decodes h264-compressed packets and publishes decoded images
 #### Published topics
 **image** (sensor_msgs/Image)
 
+### rgb24_controller
+converts rgb-formatted packets to bgr images and publishes them
+
+#### Published topics
+**image** (sensor_msgs/Image)
+
+#### Parameters
+**~image_width** (int, default: 640)
+
+**~image_height** (int, default: 480)
+
 ### uyvy_controller
-converts uyvy-formatted packets to rgb images and publishes them
+converts uyvy-formatted packets to bgr images and publishes them
 
 #### Published topics
 **image** (sensor_msgs/Image)
@@ -77,7 +88,7 @@ converts uyvy-formatted packets to rgb images and publishes them
 **~image_height** (int, default: 480)
 
 ### yuyv_controller 
-converts yuyv-formatted packets to rgb images and publishes them
+converts yuyv-formatted packets to bgr images and publishes them
 
 #### Published topics
 **image** (sensor_msgs/Image)
