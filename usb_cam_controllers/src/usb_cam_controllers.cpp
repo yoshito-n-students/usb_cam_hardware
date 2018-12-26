@@ -11,5 +11,6 @@ PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::CameraInfoController,
 PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::H264Controller, controller_interface::ControllerBase);
 PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::MjpegController, controller_interface::ControllerBase);
 PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::PacketController, controller_interface::ControllerBase);
+PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::RGB24Controller, controller_interface::ControllerBase);
 PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::UYVYController, controller_interface::ControllerBase);
 PLUGINLIB_EXPORT_CLASS(usb_cam_controllers::YUYVController, controller_interface::ControllerBase);
