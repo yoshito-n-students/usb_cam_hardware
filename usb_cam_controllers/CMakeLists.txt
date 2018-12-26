@@ -159,6 +159,10 @@ add_library(
 ## target back to the shorter version for ease of user use
 ## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
 # set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+target_compile_features(
+  usb_cam_controllers PRIVATE
+  cxx_local_type_template_args
+)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
