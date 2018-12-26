@@ -8,7 +8,7 @@ An USB camera driver which is almost compatible to [usb_cam](http://wiki.ros.org
 * accepts 3rd party controllers
 
 ### Published topics
-depens on [controllers](#Controllers)
+depends on [controllers](#Controllers)
 
 ### Parameters
 **~video_device** (string, default: "/dev/video0")
