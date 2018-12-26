@@ -14,12 +14,14 @@
 
 extern "C" {
 #include <libavcodec/avcodec.h>
+#include <libavutil/imgutils.h>
 #include <libswscale/swscale.h>
 }
 
 namespace usb_cam_controllers {
 
-template < AVCodecID CodecId > class DecodingController : public SimplePacketController {
+template < AVCodecID CodecId, AVPixelFormat DstFormat, const std::string *DstEncoding >
+class DecodingController : public SimplePacketController {
 public:
   DecodingController() {}
 
@@ -51,8 +53,6 @@ protected:
       ROS_ERROR_STREAM("Failed to open the codec (codec id: " << CodecId << ")");
       return false;
     }
-
-    encoding_ = controller_nh.param< std::string >("encoding", sensor_msgs::image_encodings::BGR8);
 
     // init publisher for decoded images
     publisher_ = image_transport::ImageTransport(controller_nh).advertise("image", 1);
@@ -86,12 +86,13 @@ protected:
       if (got_frame > 0) {
         // allocate output message
         const sensor_msgs::ImagePtr out(new sensor_msgs::Image());
+        const int data_size(av_image_get_buffer_size(DstFormat, frame->width, frame->height, 1));
         out->header.stamp = packet_iface_.getStamp();
         out->height = frame->height;
         out->width = frame->width;
-        out->encoding = encoding_;
-        out->step = 3 * frame->width;
-        out->data.resize(3 * frame->width * frame->height);
+        out->encoding = *DstEncoding;
+        out->step = data_size / frame->height;
+        out->data.resize(data_size);
 
         // layout data by converting color spaces (YUV -> RGB)
         boost::shared_ptr< SwsContext > convert_ctx(
@@ -100,12 +101,12 @@ protected:
                 frame->width, frame->height,
                 toUndeprecated(static_cast< AVPixelFormat >(frame->format)),
                 // dst formats
-                frame->width, frame->height, AV_PIX_FMT_BGR24,
+                frame->width, frame->height, DstFormat,
                 // flags & filters
                 SWS_FAST_BILINEAR, NULL, NULL, NULL),
             sws_freeContext);
-        int stride = 3 * frame->width;
-        uint8_t *dst = &out->data[0];
+        int stride(out->step);
+        uint8_t *dst(&out->data[0]);
         sws_scale(convert_ctx.get(),
                   // src data
                   frame->data, frame->linesize, 0, frame->height,
@@ -158,14 +159,16 @@ private:
   }
 
 private:
-  std::string encoding_;
-
   boost::shared_ptr< AVCodecContext > decoder_ctx_;
   image_transport::Publisher publisher_;
 };
 
-typedef DecodingController< AV_CODEC_ID_H264 > H264Controller;
-typedef DecodingController< AV_CODEC_ID_MJPEG > MjpegController;
+typedef DecodingController< AV_CODEC_ID_H264, AV_PIX_FMT_BGR24,
+                            &sensor_msgs::image_encodings::BGR8 >
+    H264Controller;
+typedef DecodingController< AV_CODEC_ID_MJPEG, AV_PIX_FMT_BGR24,
+                            &sensor_msgs::image_encodings::BGR8 >
+    MjpegController;
 
 } // namespace usb_cam_controllers
 
