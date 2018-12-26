@@ -1,3 +1,4 @@
+#include <controller_interface/controller_base.h>
 #include <pluginlib/class_list_macros.h>
 
 #include "usb_cam_controllers/camera_info_controller.hpp"

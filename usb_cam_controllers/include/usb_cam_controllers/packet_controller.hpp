@@ -1,6 +1,7 @@
 #ifndef USB_CAM_CONTROLLERS_PACKET_CONTROLLER
 #define USB_CAM_CONTROLLERS_PACKET_CONTROLLER
 
+#include <cmath>
 #include <string>
 
 #include <ros/duration.h>

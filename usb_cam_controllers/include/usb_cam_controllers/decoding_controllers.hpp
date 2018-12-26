@@ -1,6 +1,8 @@
 #ifndef USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 #define USB_CAM_CONTROLLERS_DECODING_CONTROLLERS
 
+#include <string>
+
 #include <image_transport/image_transport.h>
 #include <image_transport/publisher.h>
 #include <ros/console.h>
