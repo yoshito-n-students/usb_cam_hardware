@@ -69,7 +69,7 @@ private:
   int height_, width_;
 
   image_transport::Publisher publisher_;
-}; // namespace usb_cam_controllers
+};
 
 typedef FormatController< cv::COLOR_YUV2BGR_UYVY, &sensor_msgs::image_encodings::BGR8 >
     UYVYController;
