@@ -1,5 +1,6 @@
 <launch>
 
+  <!-- Use different namespaces for the 2nd camera or greater -->
   <group ns="usb_cam">
 
     <!-- USB camera driver + controller manager -->
@@ -14,9 +15,13 @@
       <param name="framerate" value="30"/>
     </node>
 
-    <!-- Controller starter that ask the manager to start -->
+    <!-- Controller starter that asks the manager to start -->
     <node name="controller_starter" pkg="controller_manager" type="controller_manager" 
           args="spawn camera_info_controller h264_controller packet_controller" output="screen"/>
+    <!-- Recommendation: use controllers you actually required -->
+    <!--   camera_info_controller publishes camera infos synchronized with images -->
+    <!--   h264_controller does server-side decoding (usually heavy) and publishes images -->
+    <!--   packet_controller publishes raw packets from the camera (so requires subscriber-side decoding) -->
 
     <!-- Parameters for controllers -->
     <param name="camera_info_controller/type" value="usb_cam_controllers/CameraInfoController"/>
