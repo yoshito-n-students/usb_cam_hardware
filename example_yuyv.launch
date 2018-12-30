@@ -6,6 +6,7 @@
     <!-- USB camera driver + controller manager -->
     <node name="hardware" pkg="usb_cam_hardware" type="usb_cam_hardware_node" output="screen">
       <remap from="camera_info_controller/camera_info" to="camera_info"/>
+      <remap from="packet_controller/image" to="packet"/>
       <remap from="yuyv_controller/image" to="image"/>
       <param name="video_device" value="/dev/video1"/>
       <param name="image_width" value="640"/>
@@ -20,7 +21,7 @@
     <!-- Recommendation: use controllers you actually required -->
     <!--   camera_info_controller publishes camera infos synchronized with images -->
     <!--   packet_controller publishes packets from the camera -->
-    <!--   yuyv_controller does server-side formatting (YUYV to RGB) and publishes images -->
+    <!--   yuyv_controller does server-side formatting (YUYV to BGR) and publishes images -->
     
     <!-- Parameters for controllers -->
     <param name="camera_info_controller/type" value="usb_cam_controllers/CameraInfoController"/>
