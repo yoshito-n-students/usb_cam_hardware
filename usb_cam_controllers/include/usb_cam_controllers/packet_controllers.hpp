@@ -16,6 +16,8 @@
 #include <usb_cam_controllers/simple_packet_controller.hpp>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
+#include <opencv2/core/core.hpp>
+
 namespace usb_cam_controllers {
 
 class PacketController : public SimplePacketController {
@@ -83,7 +85,7 @@ public:
 protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                         ros::NodeHandle &controller_nh) {
-    format_ = controller_nh.param< std::string >("format", "");
+    format_ = controller_nh.param< std::string >("format", "jpeg");
     skip_max_ = std::max(controller_nh.param("skip", /* pub every packet */ 0), 0);
 
     skip_cnt_ = skip_max_;
@@ -98,7 +100,7 @@ protected:
 
   virtual void updateImpl(const ros::Time &time, const ros::Duration &period) {
     // publish the current packet if enough number of previous packets are skipped
-    if (skip_cnt_ == skip_max_) {
+    if (skip_cnt_ >= skip_max_) {
       // reset skip count
       skip_cnt_ = 0;
 

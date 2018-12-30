@@ -64,7 +64,7 @@ publishes raw packets from the camera as compressed images
 **packet** (sensor_msgs/CompressedImage)
 
 #### Parameters
-**format** (string, default: "")
+**format** (string, default: "jpeg")
 * value of CompressedImage::format
 
 **skip** (int, default: 0)
