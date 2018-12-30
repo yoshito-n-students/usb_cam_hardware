@@ -17,20 +17,20 @@
 
     <!-- Controller starter that asks the manager to start -->
     <node name="controller_starter" pkg="controller_manager" type="controller_manager" 
-          args="spawn camera_info_controller h264_controller packet_controller" output="screen"/>
+          args="spawn camera_info_controller compressed_packet_controller h264_controller" output="screen"/>
     <!-- Recommendation: use controllers you actually required -->
     <!--   camera_info_controller publishes camera infos synchronized with images -->
+    <!--   compressed_packet_controller publishes packets from the camera (so requires subscriber-side decoding) -->
     <!--   h264_controller does server-side decoding (usually heavy) and publishes images -->
-    <!--   packet_controller publishes raw packets from the camera (so requires subscriber-side decoding) -->
 
     <!-- Parameters for controllers -->
     <param name="camera_info_controller/type" value="usb_cam_controllers/CameraInfoController"/>
     <param name="camera_info_controller/camera_frame_id" value="insta360"/>
 
+    <param name="compressed_packet_controller/type" value="usb_cam_controllers/CompressedPacketController"/>
+    <param name="compressed_packet_controller/format" value="h264"/>
+    
     <param name="h264_controller/type" value="usb_cam_controllers/H264Controller"/>
-
-    <param name="packet_controller/type" value="usb_cam_controllers/PacketController"/>
-    <param name="packet_controller/format" value="h264"/>
 
   </group>
 
