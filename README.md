@@ -40,7 +40,25 @@ publishes camera information syncronized to packets from the camera
 **camera_name** (string, default: "head_camera")
 
 ### PacketController
-publishes raw packets from the camera without decoding them
+publishes raw packets from the camera as images
+
+#### Published topics
+**image** (sensor_msgs/Image)
+
+#### Parameters
+**~image_width** (int, default: 640)
+
+**~image_height** (int, default: 480)
+
+**encoding** (string, default: "bgr8")
+* value of Image::encoding
+
+**skip** (int, default: 0)
+* number of packets skipped after publishment
+* useful to throttle network usage
+
+### CompressedPacketController
+publishes raw packets from the camera as compressed images
 
 #### Published topics
 **packet** (sensor_msgs/CompressedImage)
