@@ -8,6 +8,14 @@
     </description>
   </class>
 
+  <class name="usb_cam_controllers/CompressedPacketController" type="usb_cam_controllers::CompressedPacketController" 
+         base_class_type="controller_interface::ControllerBase">
+    <description>
+      This controller publishes raw packets read by the hardware as sensor_msgs::CompressedImage.
+      The controller expects a usb_cam_hardware_interface::PacketInterface as hardware interface.
+    </description>
+  </class>
+
   <class name="usb_cam_controllers/H264Controller" type="usb_cam_controllers::H264Controller" 
          base_class_type="controller_interface::ControllerBase">
     <description>
@@ -27,7 +35,7 @@
   <class name="usb_cam_controllers/PacketController" type="usb_cam_controllers::PacketController" 
          base_class_type="controller_interface::ControllerBase">
     <description>
-      This controller publishes raw packets read by the hardware. 
+      This controller publishes raw packets read by the hardware as sensor_msgs::Image.
       The controller expects a usb_cam_hardware_interface::PacketInterface as hardware interface.
     </description>
   </class>
