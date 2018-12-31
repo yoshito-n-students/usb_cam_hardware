@@ -9,6 +9,7 @@
 #include <ros/console.h>
 #include <ros/duration.h>
 #include <ros/node_handle.h>
+#include <ros/rate.h>
 #include <ros/time.h>
 #include <usb_cam_hardware_interface/packet_interface.hpp>
 
@@ -28,7 +29,9 @@ public:
 
   virtual ~USBCamHardware() { uninit(); }
 
-  bool init(ros::NodeHandle param_nh) {
+  // init the camera.
+  // returns the framerate which the camera is operated at on success, or negative framerate on failure.
+  ros::Rate init(ros::NodeHandle param_nh) {
     // register the packet buffer to the interface so that controllers can see the packet
     {
       packet_.stamp = ros::Time(0);
@@ -46,7 +49,7 @@ public:
       fd_ = open(video_device.c_str(), O_RDWR | O_NONBLOCK);
       if (fd_ < 0) {
         ROS_ERROR_STREAM("Cannot open \"" << video_device << "\"");
-        return false;
+        return ros::Rate(-1.);
       }
     }
 
@@ -88,30 +91,33 @@ public:
         format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
       } else {
         ROS_ERROR_STREAM("Pixel format \"" << pixel_format << "\" is not supported");
-        return false;
+        return ros::Rate(-1.);
       }
       format.fmt.pix.field = V4L2_FIELD_INTERLACED;
       if (xioctl(fd_, VIDIOC_S_FMT, &format) < 0) {
         ROS_ERROR("Cannot set format");
-        return false;
+        return ros::Rate(-1.);
       }
     }
 
     // set framerate
+    ros::Rate rate(-1.);
     {
       v4l2_streamparm streamparm;
       std::memset(&streamparm, 0, sizeof(streamparm));
       streamparm.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       if (xioctl(fd_, VIDIOC_G_PARM, &streamparm) < 0) {
         ROS_ERROR("Cannot get streaming parameters");
-        return false;
+        return ros::Rate(-1.);
       }
-      streamparm.parm.capture.timeperframe.numerator = 1;
-      streamparm.parm.capture.timeperframe.denominator = param_nh.param("framerate", 30);
+      v4l2_fract &timeperframe(streamparm.parm.capture.timeperframe);
+      timeperframe.numerator = 1;
+      timeperframe.denominator = param_nh.param("framerate", 30);
       if (xioctl(fd_, VIDIOC_S_PARM, &streamparm) < 0) {
         ROS_ERROR("Cannot set framerate");
-        return false;
+        return ros::Rate(-1.);
       }
+      rate = ros::Rate(static_cast< double >(timeperframe.denominator) / timeperframe.numerator);
     }
 
     // allocate buffers
@@ -124,11 +130,11 @@ public:
       reqbufs.memory = V4L2_MEMORY_MMAP;
       if (xioctl(fd_, VIDIOC_REQBUFS, &reqbufs) < 0) {
         ROS_ERROR("Cannot request buffers");
-        return false;
+        return ros::Rate(-1.);
       }
       if (reqbufs.count < 2) {
         ROS_ERROR("Insufficient buffer memory on the device");
-        return false;
+        return ros::Rate(-1.);
       }
 
       for (std::size_t i = 0; i < reqbufs.count; ++i) {
@@ -139,7 +145,7 @@ public:
         buffer.index = i;
         if (xioctl(fd_, VIDIOC_QUERYBUF, &buffer) < 0) {
           ROS_ERROR("Cannot query buffer");
-          return false;
+          return ros::Rate(-1.);
         }
 
         Buffer mapped_buffer;
@@ -148,7 +154,7 @@ public:
         mapped_buffer.length = buffer.length;
         if (mapped_buffer.start == MAP_FAILED) {
           ROS_ERROR("Cannot map memory");
-          return false;
+          return ros::Rate(-1.);
         }
 
         buffers_.push_back(mapped_buffer);
@@ -165,7 +171,7 @@ public:
         buffer.index = i;
         if (xioctl(fd_, VIDIOC_QBUF, &buffer) < 0) {
           ROS_ERROR("Cannot enqueue buffer");
-          return false;
+          return ros::Rate(-1.);
         }
       }
 
@@ -173,11 +179,11 @@ public:
       buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       if (xioctl(fd_, VIDIOC_STREAMON, &buf_type) < 0) {
         ROS_ERROR("Cannot start streaming");
-        return false;
+        return ros::Rate(-1.);
       }
     }
 
-    return true;
+    return rate;
   }
 
   virtual void read(const ros::Time &time, const ros::Duration &period) {
