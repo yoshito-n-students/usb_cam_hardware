@@ -11,18 +11,22 @@ int main(int argc, char *argv[]) {
   ros::init(argc, argv, "usb_cam_hardware");
   ros::NodeHandle nh, pnh("~");
 
+  // init the camera and get the framerate which the camera is operated at
   usb_cam_hardware::USBCamHardware hardware;
-  if (!hardware.init(pnh)) {
+  ros::Rate control_rate(hardware.init(pnh));
+  if (control_rate.expectedCycleTime() < ros::Duration(0.)) {
     ROS_ERROR("Cannot initialize the usb cam hardware");
     return 1;
   }
 
+  // bind controller manager and the camera
   controller_manager::ControllerManager controllers(&hardware, nh);
   ros::AsyncSpinner spinner(1); // to exec callbacks of controller management services
   spinner.start();
 
-  ros::Rate control_rate(pnh.param("framerate", 30));
+  // run control loops
   ros::Time last(ros::Time::now());
+  control_rate.reset(); // set the start time of control to now
   while (ros::ok()) {
     const ros::Time now(ros::Time::now());
     const ros::Duration period(now - last);
