@@ -13,8 +13,8 @@ int main(int argc, char *argv[]) {
 
   // init the camera and get the framerate which the camera is operated at
   usb_cam_hardware::USBCamHardware hardware;
-  ros::Rate control_rate(hardware.init(pnh));
-  if (control_rate.expectedCycleTime() < ros::Duration(0.)) {
+  const ros::Duration time_per_frame(hardware.init(pnh));
+  if (time_per_frame <= ros::Duration(0.)) {
     ROS_ERROR("Cannot initialize the usb cam hardware");
     return 1;
   }
@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
   // run control loops
   ros::Time last(ros::Time::now());
-  control_rate.reset(); // set the start time of control to now
+  ros::Rate rate(time_per_frame);
   while (ros::ok()) {
     const ros::Time now(ros::Time::now());
     const ros::Duration period(now - last);
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     controllers.update(now, period);
     hardware.write(now, period);
     last = now;
-    control_rate.sleep();
+    rate.sleep();
   }
 
   return 0;
