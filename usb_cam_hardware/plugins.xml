@@ -1,0 +1,10 @@
+<library path="lib/libusb_cam_hardware">
+
+  <class name="usb_cam_hardware/USBCamHardware" type="usb_cam_hardware::USBCamHardwareNodelet" 
+         base_class_type="nodelet::Nodelet">
+    <description>
+      USBCamHardwareNodelet
+    </description>
+  </class>
+
+</library>
