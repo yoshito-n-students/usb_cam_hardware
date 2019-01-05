@@ -10,6 +10,8 @@ project(usb_cam_hardware)
 find_package(catkin REQUIRED COMPONENTS
   controller_manager
   hardware_interface
+  nodelet
+  pluginlib
   roscpp
   usb_cam_hardware_interface
 )
@@ -105,8 +107,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES usb_cam_hardware
-  CATKIN_DEPENDS controller_manager hardware_interface roscpp usb_cam_hardware_interface
+  LIBRARIES usb_cam_hardware
+  CATKIN_DEPENDS controller_manager hardware_interface nodelet pluginlib roscpp usb_cam_hardware_interface
 #  DEPENDS system_lib
 )
 
@@ -122,9 +124,10 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/usb_cam_hardware.cpp
-# )
+add_library(
+  usb_cam_hardware
+  src/usb_cam_hardware_nodelet.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -150,6 +153,10 @@ add_executable(
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
+target_link_libraries(
+  usb_cam_hardware
+  ${catkin_LIBRARIES}
+)
 target_link_libraries(
   usb_cam_hardware_node
   ${catkin_LIBRARIES}
