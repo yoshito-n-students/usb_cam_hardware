@@ -118,5 +118,5 @@ converts yuyv-formatted packets to bgr images and publishes them
 **~image_height** (int, default: 480)
 
 ## Related ROS packages
-[h264_image_transport](https://github.com/yoshito-okada/h264_image_transport)
+[h264_image_transport](https://github.com/yoshito-n-students/h264_image_transport)
 * for subscriber-side decoding of h264 packets published by the packet_controller
