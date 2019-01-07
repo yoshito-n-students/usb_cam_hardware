@@ -4,7 +4,8 @@
   <group ns="usb_cam">
 
     <!-- USB camera driver + controller manager -->
-    <node name="hardware" pkg="usb_cam_hardware" type="usb_cam_hardware_node" output="screen">
+    <node name="hardware" pkg="nodelet" type="nodelet" 
+          args="standalone usb_cam_hardware/USBCamHardware" output="screen">
       <remap from="camera_info_controller/camera_info" to="camera_info"/>
       <remap from="packet_controller/image" to="packet"/>
       <remap from="yuyv_controller/image" to="image"/>
