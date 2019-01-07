@@ -141,10 +141,10 @@ target_compile_features(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(
-  usb_cam_hardware_node
-  src/usb_cam_hardware_node.cpp
-)
+# add_executable(
+#   usb_cam_hardware_node
+#   src/usb_cam_hardware_node.cpp
+# )
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -161,10 +161,10 @@ target_link_libraries(
   usb_cam_hardware
   ${catkin_LIBRARIES}
 )
-target_link_libraries(
-  usb_cam_hardware_node
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(
+#   usb_cam_hardware_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
