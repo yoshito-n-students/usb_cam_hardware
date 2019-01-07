@@ -4,10 +4,11 @@
   <group ns="usb_cam">
 
     <!-- USB camera driver + controller manager -->
-    <node name="hardware" pkg="usb_cam_hardware" type="usb_cam_hardware_node" output="screen">
+    <node name="hardware" pkg="nodelet" type="nodelet" 
+          args="standalone usb_cam_hardware/USBCamHardware" output="screen">
       <remap from="camera_info_controller/camera_info" to="camera_info"/>
       <remap from="mjpeg_controller/image" to="image"/>
-      <remap from="packet_controller/packet" to="packet/compressed"/>
+      <remap from="compressed_packet_controller/packet" to="packet/compressed"/>
       <param name="video_device" value="/dev/video1"/>
       <param name="image_width" value="1472"/>
       <param name="image_height" value="736"/>
