@@ -27,7 +27,7 @@ public:
 
 private:
   virtual void onInit() {
-    ros::NodeHandle nh(getNodeHandle()), pnh(getPrivateNodeHandle());
+    ros::NodeHandle nh(getMTNodeHandle()), pnh(getMTPrivateNodeHandle());
 
     hardware_ = boost::make_shared< USBCamHardware >();
     const ros::Duration time_per_frame(hardware_->init(pnh));
