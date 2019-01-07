@@ -1,8 +1,9 @@
 # usb_cam_hardware
 USB camera driver based on ros_control
 
-## Node: usb_cam_hardware_node
+## Nodelet: usb_cam_hardware/USBCamHardware
 An USB camera driver which is almost compatible to [usb_cam](http://wiki.ros.org/usb_cam) but based on [ros_control](http://wiki.ros.org/ros_control). Major enhancements over usb_cam are;
+* impremented as a nodelet
 * supports h264 pixel format (1/10 network usage compared with mjpeg)
 * publishes raw packets from the camera (1/10 cpu usage and less latency compared with decoding mjpeg packets in the node)
 * accepts 3rd party controllers
