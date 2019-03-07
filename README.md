@@ -47,9 +47,9 @@ publishes raw packets from the camera as images
 **image** (sensor_msgs/Image)
 
 #### Parameters
-**~image_width** (int, default: 640)
+**image_width** (int, default: 640)
 
-**~image_height** (int, default: 480)
+**image_height** (int, default: 480)
 
 **encoding** (string, default: "bgr8")
 * value of Image::encoding
@@ -91,9 +91,9 @@ converts rgb-formatted packets to bgr images and publishes them
 **image** (sensor_msgs/Image)
 
 #### Parameters
-**~image_width** (int, default: 640)
+**image_width** (int, default: 640)
 
-**~image_height** (int, default: 480)
+**image_height** (int, default: 480)
 
 ### UYVYController
 converts uyvy-formatted packets to bgr images and publishes them
@@ -102,9 +102,9 @@ converts uyvy-formatted packets to bgr images and publishes them
 **image** (sensor_msgs/Image)
 
 #### Parameters
-**~image_width** (int, default: 640)
+**image_width** (int, default: 640)
 
-**~image_height** (int, default: 480)
+**image_height** (int, default: 480)
 
 ### YUYVController 
 converts yuyv-formatted packets to bgr images and publishes them
@@ -113,9 +113,9 @@ converts yuyv-formatted packets to bgr images and publishes them
 **image** (sensor_msgs/Image)
 
 #### Parameters
-**~image_width** (int, default: 640)
+**image_width** (int, default: 640)
 
-**~image_height** (int, default: 480)
+**image_height** (int, default: 480)
 
 ## Related ROS packages
 [codec_image_transport](https://github.com/yoshito-n-students/codec_image_transport)
