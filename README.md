@@ -1,6 +1,8 @@
 # usb_cam_hardware
 USB camera driver based on ros_control
 
+[Slides from ROS Japan UG #28](https://drive.google.com/file/d/15ueFzd4BfJbSNH38vfEatP0qbntPlJCy/view) (in Japanese)
+
 ## Nodelet: usb_cam_hardware/USBCamHardware
 An USB camera driver which is almost compatible to [usb_cam](http://wiki.ros.org/usb_cam) but based on [ros_control](http://wiki.ros.org/ros_control). Major enhancements over usb_cam are;
 * impremented as a nodelet
