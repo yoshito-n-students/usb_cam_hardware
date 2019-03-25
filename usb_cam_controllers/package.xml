@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>usb_cam_controllers</name>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <description>The usb_cam_controllers package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
