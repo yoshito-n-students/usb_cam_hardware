@@ -33,7 +33,6 @@ protected:
   virtual bool initImpl(usb_cam_hardware_interface::PacketInterface *hw, ros::NodeHandle &root_nh,
                         ros::NodeHandle &controller_nh) {
     // init libavcodec
-    avcodec_register_all();
     av_log_set_level(AV_LOG_FATAL);
 
     // find h264 decoder
