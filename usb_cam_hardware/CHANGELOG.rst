@@ -2,6 +2,11 @@
 Changelog for package usb_cam_hardware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2020-07-10)
+------------------
+* Fix typo in default pixel_format ("mpjeg" -> "mjpeg")
+* Bump minor version to 0.2.X to indicate noetic release
+
 0.0.5 (2020-05-28)
 ------------------
 * Port to noetic distro
