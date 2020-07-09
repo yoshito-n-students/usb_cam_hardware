@@ -76,7 +76,7 @@ public:
       format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
       format.fmt.pix.width = param_nh.param("image_width", 640);
       format.fmt.pix.height = param_nh.param("image_height", 480);
-      const std::string pixel_format(param_nh.param< std::string >("pixel_format", "mpjeg"));
+      const std::string pixel_format(param_nh.param< std::string >("pixel_format", "mjpeg"));
       if (pixel_format == "grey") {
         format.fmt.pix.pixelformat = V4L2_PIX_FMT_GREY;
       } else if (pixel_format == "h264") {
