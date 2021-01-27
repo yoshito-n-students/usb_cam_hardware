@@ -19,7 +19,7 @@ runs:
       run: |
         echo actor is ${GITHUB_ACTOR}
         echo token is ${GITHUB_TOKEN}
-        git clone --branch ${INPUT_BRANCH} "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/yoshito-n-students/usb_cam_hardware.git" src/usb_cam_hardware
+        git clone --branch ${INPUT_BRANCH} -- "https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/yoshito-n-students/usb_cam_hardware.git" src/usb_cam_hardware
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
