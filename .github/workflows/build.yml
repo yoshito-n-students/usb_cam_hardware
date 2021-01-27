@@ -9,9 +9,10 @@ on:
 jobs:
   build:
     strategy:
-      include:
-        - branch: kinetic-devel
-          rosdistro: kinetic
+      matrix:
+        include:
+          - branch: kinetic-devel
+            rosdistro: kinetic
     runs-on: ubuntu-latest
     container:
       image: ros:${{ matrix.rosdistro }}-ros-base
