@@ -21,4 +21,4 @@ jobs:
         shell: bash
     steps:
       - run: |
-          echo ${{ github.event_path }}
+          less ${{ github.event_path }}
