@@ -21,4 +21,4 @@ jobs:
         shell: bash
     steps:
       - run: |
-          cat ${{ github.event_path }}
+          cat ${{ github.event.ref }}
