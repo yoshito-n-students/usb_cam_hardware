@@ -11,8 +11,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - branch: kinetic-devel
+          - event-ref: refs/heads/kinetic-devel
             rosdistro: kinetic
+          - event-ref: refs/heads/actions
+            rosdistro: noetic
+    if: ${{ github.event.ref == matrix.evnet-ref }}
     runs-on: ubuntu-latest
     container:
       image: ros:${{ matrix.rosdistro }}-ros-base
@@ -21,4 +24,4 @@ jobs:
         shell: bash
     steps:
       - run: |
-          cat ${{ github.event.ref }}
+          echo ${{ github.event.ref }}
