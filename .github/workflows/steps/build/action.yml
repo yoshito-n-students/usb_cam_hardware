@@ -17,7 +17,5 @@ runs:
       shell: bash
     - name: Checkout
       run: |
-        git clone --branch ${INPUT_BRANCH} \
-          https://github.com/yoshito-n-students/usb_cam_hardware.git \
-          src/usb_cam_hardware
+        git clone --branch ${INPUT_BRANCH} https://github.com/yoshito-n-students/usb_cam_hardware.git src/usb_cam_hardware
       shell: bash
