@@ -49,3 +49,6 @@ qtcreator-*
 
 # Catkin custom files
 CATKIN_IGNORE
+
+# Not a build directory despite its name
+!.github/workflows/steps/build/

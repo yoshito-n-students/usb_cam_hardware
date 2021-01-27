@@ -1,0 +1,23 @@
+name: Build
+description: Build
+inputs:
+  rosdistro:
+    description: rosdistro
+    required: true
+  branch:
+    description: branch to chechout
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: System update
+      run: |
+        sudo apt update
+        sudo apt --yes upgrade
+      shell: bash
+    - name: Checkout
+      run: |
+        git clone --branch ${INPUT_BRANCH} \
+          https://github.com/yoshito-n-students/usb_cam_hardware.git \
+          src/usb_cam_hardware
+      shell: bash

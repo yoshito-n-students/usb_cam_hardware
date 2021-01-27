@@ -8,20 +8,14 @@ on:
       - actions
 jobs:
   build:
-    strategy:
-      matrix:
-        include:
-          - event-ref: refs/heads/kinetic-devel
-            rosdistro: kinetic
-          - event-ref: refs/heads/actions
-            rosdistro: noetic
-    if: ${{ github.event.ref == matrix.event-ref }}
     runs-on: ubuntu-latest
     container:
-      image: ros:${{ matrix.rosdistro }}-ros-base
+      image: ros:kinetic-ros-base
     defaults:
       run:
         shell: bash
     steps:
-      - run: |
-          echo ${{ github.event.ref }}
+      - uses: yoshito-n-students/usb_cam_hardware/.github/workflows/steps/build@actions
+        with:
+          rosdistro: kinetic
+          branch: kinetic-devel
