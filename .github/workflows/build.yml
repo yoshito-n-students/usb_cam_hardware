@@ -15,7 +15,7 @@ jobs:
             rosdistro: kinetic
           - event-ref: refs/heads/actions
             rosdistro: noetic
-    if: ${{ github.event.ref == matrix.evnet-ref }}
+    if: ${{ github.event.ref == matrix.event-ref }}
     runs-on: ubuntu-latest
     container:
       image: ros:${{ matrix.rosdistro }}-ros-base
