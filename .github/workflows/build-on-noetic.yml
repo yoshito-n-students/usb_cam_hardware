@@ -1,0 +1,16 @@
+name: Build on noetic
+on:
+  push:
+    branches:
+      - noetic-devel
+      - actions
+jobs:
+  build-on-noetic:
+    runs-on: ubuntu-latest
+    container:
+      image: ros:noetic-ros-base
+    steps:
+      - uses: yoshito-n-students/usb_cam_hardware/.github/workflows/steps/build@actions
+        with:
+          rosdistro: noetic
+          branch: noetic-devel

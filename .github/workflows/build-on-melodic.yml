@@ -1,0 +1,16 @@
+name: Build on melodic
+on:
+  push:
+    branches:
+      - melodic-devel
+      - actions
+jobs:
+  build-on-melodic:
+    runs-on: ubuntu-latest
+    container:
+      image: ros:melodic-ros-base
+    steps:
+      - uses: yoshito-n-students/usb_cam_hardware/.github/workflows/steps/build@actions
+        with:
+          rosdistro: melodic
+          branch: melodic-devel
