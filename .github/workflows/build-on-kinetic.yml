@@ -5,13 +5,10 @@ on:
       - kinetic-devel
       - actions
 jobs:
-  build:
+  build-on-kinetic:
     runs-on: ubuntu-latest
     container:
       image: ros:kinetic-ros-base
-    defaults:
-      run:
-        shell: bash
     steps:
       - uses: yoshito-n-students/usb_cam_hardware/.github/workflows/steps/build@actions
         with:
