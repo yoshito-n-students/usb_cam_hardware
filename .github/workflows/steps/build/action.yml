@@ -21,3 +21,15 @@ runs:
           https://github.com/yoshito-n-students/usb_cam_hardware.git \
           src/usb_cam_hardware
       shell: bash
+    - name: Install dependencies
+      run: |
+        source /opt/ros/${{ inputs.rosdistro }}/setup.bash
+        sudo apt update
+        rosdep update --rosdistro ${{ inputs.rosdistro }}
+        sudo rosdep install --default-yes -r --ignore-src --from-paths src --rosdistro ${{ inputs.rosdistro }}
+      shell: bash
+    - name: Build
+      run: |
+        source /opt/ros/${{ inputs.rosdistro }}/setup.bash
+        catkin_make
+      shell: bash

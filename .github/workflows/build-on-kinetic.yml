@@ -1,10 +1,8 @@
-name: Build
+name: Build on kinetic
 on:
   push:
     branches:
       - kinetic-devel
-      - melodic-devel
-      - noetic-devel
       - actions
 jobs:
   build:
