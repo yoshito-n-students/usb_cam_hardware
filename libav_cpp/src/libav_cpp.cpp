@@ -1,6 +1,5 @@
 #include <array>
 #include <cstring> // for std::memset()
-#include <iostream>
 #include <numeric> // for std::partial_sum()
 
 extern "C" {
