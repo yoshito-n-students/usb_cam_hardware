@@ -63,11 +63,9 @@ int main(int argc, char *argv[]) {
 
             // Send the packet to the decoder
             decoder.send_packet(packet);
-            RCLCPP_INFO(node->get_logger(), "Sent packet to the decoder: %d bytes", packet->size);
 
             // Receive and publish the decoded frames
             while (decoder.receive_frame(&frame)) {
-              RCLCPP_INFO(node->get_logger(), "Decoded frame: %dx%d", frame->width, frame->height);
               // Copy the frame properties to the destination image
               auto image = std::make_unique<sensor_msgs::msg::Image>();
               image->header.stamp = packet_data->header.stamp;
