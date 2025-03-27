@@ -20,7 +20,8 @@ int main(int argc, char *argv[]) {
   const std::map<std::string, std::string> option_map = {
       {"input_format", node->declare_parameter("input_format", "h264")},
       {"video_size", node->declare_parameter("video_size", "1920x1080")},
-      {"framerate", node->declare_parameter("framerate", "30")}};
+      {"framerate", node->declare_parameter("framerate", "30")},
+      {"timestamps", node->declare_parameter("timestamps", "abs")}};
 
   // Setup the destination packet publisher
   const auto publisher =
